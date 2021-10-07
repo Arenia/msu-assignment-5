@@ -1,0 +1,34 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Professors</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Office</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @professors.each do |professor| %>
+      <tr>
+        <td><%= professor.name %></td>
+        <td><%= professor.office %></td>
+        <td><%= link_to 'Show', professor %></td>
+        <td><%= link_to 'Edit', edit_professor_path(professor) %></td>
+        <td><%= link_to 'Destroy', professor, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= form_tag(search_professors_url, method: "get") do %>
+  <%= label_tag(:query, "Search by name:") %>
+  <%= text_field_tag(:query) %>
+  <%= submit_tag("Search") %>
+<% end %>
+<br>
+
+<%= link_to 'New Professor', new_professor_path %>

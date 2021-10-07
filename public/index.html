@@ -1,0 +1,151 @@
+<html>
+<head>
+    <title>School SPA</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+
+<div id="Itemlist">
+    <button v-on:click="selection=1">Courses</button>
+    <button v-on:click="selection=2">Departments</button>
+    <button v-on:click="selection=3">Professors</button>
+    <button v-on:click="selection=4">Sections</button>
+    <button v-on:click="selection=5">Semesters</button>
+    <button v-on:click="selection=6">Students</button>
+    <span v-if="selection === 1">
+      <h1>Courses Available</h1>
+      <ul>
+        <div v-for="course in courses">
+            <li>{{departments[course.department_id-1].name}} {{course.number}}</li>
+        </div>
+      </ul>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+    <span v-else-if="selection === 2">
+      <h1>Departments</h1>
+      <h4>And the courses therein</h4>
+      <div v-for="department in departments">
+        <ul>
+          <li>{{department.name}}</li>
+          <ul>
+            <div v-for="course in courses">
+                <span v-if="course.department_id === department.id">
+                    <li>{{ course.number }}</li>
+                </span>
+            </div>
+          </ul>
+        </ul>
+      </div>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+    <span v-else-if="selection === 3">
+      <h1>Professors</h1>
+      <h4>Their offices, and the courses they teach.</h4>
+      <ul>
+        <div v-for="professor in professors">
+          <li>{{professor.name}}
+            <ul>
+              <li>Office: {{professor.office}}</li>
+              <li>Courses:</li>
+              <ul>
+                <div v-for="section in sections">
+                  <span v-if="section.professor_id === professor.id">
+                    <li>{{departments[courses[section.course_id-1].department_id-1].name}} {{courses[section.course_id-1].number}} in {{semesters[section.semester_id-1].semester}} {{section.year}}</li>
+                  </span>
+                </div>
+              </ul>
+            </ul>
+          </li>
+        </div>
+      </ul>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+    <span v-else-if="selection === 4">
+      <h1>Course Sections</h1>
+      <h4>And the students in the class</h4>
+      <ul>
+        <div v-for="section in sections">
+          <li>{{departments[courses[section.course_id-1].department_id-1].name}} {{courses[section.course_id-1].number}} in {{semesters[section.semester_id-1].semester}} {{section.year}}, taught by {{professors[section.professor_id-1].name}}</li>
+          <ul>
+            <div v-for="sections_student in sections_students">
+              <span v-if="sections_student.section_id === section.id">
+                <li>{{students[sections_student.student_id-1].name}}</li>
+              </span>
+            </div>
+          </ul>
+        </div>
+      </ul>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+    <span v-else-if="selection === 5">
+      <h1>School Semesters</h1>
+      <ul>
+        <div v-for="semester in semesters">
+          <li>{{semester.semester}}</li>
+        </div>
+      </ul>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+    <span v-else-if="selection === 6">
+      <h1>Students</h1>
+      <h4>And their courses</h4>
+      <ul>
+        <div v-for="student in students">
+          <li>{{student.name}}
+            <ul>
+              <li>Student Identifier: {{student.identifier}}</li>
+              <li>Sections: {{student.sections}}</li>
+              <ul>
+                <div v-for="sections_student in sections_students">
+                  <span v-if="student.id === sections_student.student_id">
+                    <li>{{departments[courses[sections[sections_student.section_id-1].course_id-1].department_id-1].name}} {{courses[sections[sections_student.section_id-1].course_id-1].number}} in {{semesters[sections[sections_student.section_id-1].semester_id-1].semester}} {{sections[sections_student.section_id-1].year}}, taught by {{professors[sections[sections_student.section_id-1].professor_id-1].name}}</li>
+                  </span>
+                </div>
+              </ul>
+          </li>
+        </div>
+      </ul>
+      <button v-on:click="selection=0">Clear</button>
+    </span>
+</div>
+
+<script type="text/javascript">
+var ItemsVue = new Vue({
+    el: '#Itemlist',
+    data: { departments: [],
+        selection: 0,
+        courses: [],
+        professors: [],
+        sections: [],
+        semesters: [],
+        students: [],
+        sections_students: []},
+    mounted: function() {
+        axios.get('http://localhost:3000/courses.json')
+            .then(response => { this.courses = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/departments.json')
+            .then(response => { this.departments = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/professors.json')
+            .then(response => { this.professors = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/sections.json')
+            .then(response => { this.sections = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/semesters.json')
+            .then(response => { this.semesters = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/students.json')
+            .then(response => { this.students = response.data })
+            .catch(error => { console.log(error); });
+        axios.get('http://localhost:3000/sections_students.json')
+            .then(response => { this.sections_students = response.data })
+            .catch(error => { console.log(error); });
+    }
+});
+</script>
+
+</body>
+</html>
